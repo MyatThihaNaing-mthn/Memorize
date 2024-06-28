@@ -7,19 +7,10 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    var ballTheme = ["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏉", "🥏", "🎱", "🪀"]
-    var heartTheme = ["🩷", "❤️", "🧡", "💚", "🩵", "💙", "🖤","❤️‍🔥", "💓", "💔"]
-    var animalTheme = ["🐶", "🐱", "🐰", "🦊", "🐼", "🐸", "🙈", "🦁", "🦋", "🐝"]
-    @State var currentTheme:[String]
+struct EmojiMemoryGameView: View {
     
-    init(){
-        ballTheme += ballTheme
-        heartTheme += heartTheme
-        animalTheme += animalTheme
-        _currentTheme = State(initialValue: animalTheme)
-    }
-    @State var cardCount = 4
+    @ObservedObject var viewModel: EmojiMemoryGame
+    
     var body: some View {
         VStack{
             title
@@ -36,11 +27,12 @@ struct ContentView: View {
     }
     
     var cards: some View{
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))]){
-            ForEach(0..<currentTheme.count, id: \.self){ index in
-                CardView(content: currentTheme[index])
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 0)], spacing: 0){
+            ForEach(0..<viewModel.cards.count, id: \.self){ index in
+                CardView(viewModel.cards[index])
                     .aspectRatio(2/3, contentMode: .fit)
             }
+            .padding(4)
         }
         .foregroundColor(.orange)
     }
@@ -48,28 +40,25 @@ struct ContentView: View {
     func themeChanger(theme: [String], symbol:String, label:String) -> some View{
         VStack{
             Button(action: {
-                currentTheme = theme
-                currentTheme.shuffle()
-                print("executed", theme)
+                viewModel.shuffle()
             }, label: {
                 Image(systemName: symbol)
             })
-            .disabled(currentTheme == theme)
             Text(label).font(.callout)
         }.foregroundColor(.blue)
         
     }
     
     var animalThemeButton: some View{
-        themeChanger(theme: animalTheme, symbol: "pawprint.fill", label: "Animal")
+        themeChanger(theme: [String](), symbol: "pawprint.fill", label: "Animal")
     }
     
     var heartThemeButton: some View{
-        themeChanger(theme: heartTheme, symbol: "heart.square.fill", label: "Heart")
+        themeChanger(theme: [String](), symbol: "heart.square.fill", label: "Heart")
     }
     
     var ballThemeButton: some View{
-        themeChanger(theme: ballTheme, symbol: "soccerball.circle.fill", label: "Ball")
+        themeChanger(theme: [String](), symbol: "soccerball.circle.fill", label: "Ball")
     }
     
     var themeButtonSection: some View{
@@ -89,26 +78,29 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    @State var isFaceUp = true
-    let content: String
+    let card: MemoryGame<String>.Card
+    
+    init(_ card: MemoryGame<String>.Card) {
+        self.card = card
+    }
+    
     var body: some View {
         ZStack{
             let base = RoundedRectangle(cornerRadius: 12)
             Group{
                 base.fill(.white)
                 base.strokeBorder(lineWidth: 2)
-                Text(content).font(.largeTitle)
+                Text(card.content).font(.system(size: 200))
+                    .aspectRatio(1, contentMode: .fit)
+                    .minimumScaleFactor(0.001)
             }
-            .opacity(isFaceUp ? 1 : 0)
-            base.fill().opacity(isFaceUp ? 0 : 1)
-        }
-        .onTapGesture{
-            isFaceUp.toggle()
+            .opacity(card.isFaceUp ? 1 : 0)
+            base.fill().opacity(card.isFaceUp ? 0 : 1)
         }
     }
 }
 
 
 #Preview {
-    ContentView()
+    EmojiMemoryGameView(viewModel:  EmojiMemoryGame())
 }
