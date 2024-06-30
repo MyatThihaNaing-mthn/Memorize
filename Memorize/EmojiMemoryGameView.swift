@@ -16,6 +16,7 @@ struct EmojiMemoryGameView: View {
             title
             ScrollView{
                 cards
+                    .animation(/*@START_MENU_TOKEN@*/.easeIn/*@END_MENU_TOKEN@*/, value: viewModel.cards)
             }
             themeButtonSection
         }
@@ -28,9 +29,13 @@ struct EmojiMemoryGameView: View {
     
     var cards: some View{
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 0)], spacing: 0){
-            ForEach(0..<viewModel.cards.count, id: \.self){ index in
-                CardView(viewModel.cards[index])
+            ForEach(viewModel.cards){ card in
+                CardView(card)
                     .aspectRatio(2/3, contentMode: .fit)
+                    .onTapGesture {
+                        viewModel.choose(card)
+                    }
+                    .disabled(card.isMatched)
             }
             .padding(4)
         }
@@ -84,6 +89,7 @@ struct CardView: View {
         self.card = card
     }
     
+    
     var body: some View {
         ZStack{
             let base = RoundedRectangle(cornerRadius: 12)
@@ -97,6 +103,7 @@ struct CardView: View {
             .opacity(card.isFaceUp ? 1 : 0)
             base.fill().opacity(card.isFaceUp ? 0 : 1)
         }
+        .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
     }
 }
 
