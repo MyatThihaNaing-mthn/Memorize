@@ -42,10 +42,10 @@ struct EmojiMemoryGameView: View {
         .foregroundColor(.orange)
     }
     
-    func themeChanger(theme: [String], symbol:String, label:String) -> some View{
+    func themeChanger(theme: String, symbol:String, label:String) -> some View{
         VStack{
             Button(action: {
-                viewModel.shuffle()
+                viewModel.chooseTheme(themeName: theme)
             }, label: {
                 Image(systemName: symbol)
             })
@@ -55,15 +55,15 @@ struct EmojiMemoryGameView: View {
     }
     
     var animalThemeButton: some View{
-        themeChanger(theme: [String](), symbol: "pawprint.fill", label: "Animal")
+        themeChanger(theme: "animal", symbol: "pawprint.fill", label: "Animal")
     }
     
     var heartThemeButton: some View{
-        themeChanger(theme: [String](), symbol: "heart.square.fill", label: "Heart")
+        themeChanger(theme: "heart", symbol: "heart.square.fill", label: "Heart")
     }
     
     var ballThemeButton: some View{
-        themeChanger(theme: [String](), symbol: "soccerball.circle.fill", label: "Ball")
+        themeChanger(theme: "ball", symbol: "soccerball.circle.fill", label: "Ball")
     }
     
     var themeButtonSection: some View{

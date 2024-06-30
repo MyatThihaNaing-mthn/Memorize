@@ -20,25 +20,28 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
         cards.shuffle()
     }
     
-    private var indexOfOneAndOnlyFaceUpCard: Int?
+    private var indexOfOneAndOnlyFaceUpCard: Int?{
+        get{return cards.indices.filter{index in cards[index].isFaceUp}.only}
+        
+        set{cards.indices.forEach{cards[$0].isFaceUp = ($0 == newValue)}
+        }
+    }
     
     
     mutating func choose(_ card: Card){
         if let index = cards.firstIndex(where: {$0.id == card.id }){
-            if let potentialMatchIndex = indexOfOneAndOnlyFaceUpCard{
-                if cards[potentialMatchIndex].content == cards[index].content{
-                    cards[index].isMatched = true
-                    cards[potentialMatchIndex].isMatched = true
+            if !cards[index].isMatched && !cards[index].isFaceUp{
+                if let potentialMatchIndex = indexOfOneAndOnlyFaceUpCard {
+                    if cards[potentialMatchIndex].content == cards[index].content{
+                        cards[index].isMatched = true
+                        cards[potentialMatchIndex].isMatched = true
 
+                    }
+                }else{
+                    indexOfOneAndOnlyFaceUpCard = index
                 }
-                indexOfOneAndOnlyFaceUpCard = nil
-            }else{
-                for index in cards.indices{
-                    cards[index].isFaceUp = false
-                }
-                indexOfOneAndOnlyFaceUpCard = index
+                cards[index].isFaceUp = true
             }
-            cards[index].isFaceUp = true
         }
     }
     
@@ -46,6 +49,18 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     mutating func shuffle(){
         cards.shuffle()
         print(cards)
+    }
+    
+    
+    mutating func chooseTheme(_ newTheme:[CardContent]){
+        if newTheme.count >= cards.count/2{
+            for index in cards.indices{
+                cards[index].content = newTheme[index/2]
+                cards[index].isMatched = false
+                cards[index].isFaceUp = false
+            }
+            cards.shuffle()
+        }
     }
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible{
@@ -56,8 +71,16 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
         
         var isFaceUp = true
         var isMatched = false
-        let content: CardContent
+        var content: CardContent
         
         var id: String
+    }
+}
+
+// To create a method to get the only one faceup card
+
+extension Array{
+    var only: Element?{
+        count==1 ? first : nil
     }
 }

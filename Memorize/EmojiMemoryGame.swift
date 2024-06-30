@@ -12,8 +12,8 @@ import SwiftUI
 class EmojiMemoryGame: ObservableObject{
     
     // static variable will be initialized first
-//    var ballTheme = ["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏉", "🥏", "🎱", "🪀"]
-//    var heartTheme = ["🩷", "❤️", "🧡", "💚", "🩵", "💙", "🖤","❤️‍🔥", "💓", "💔"]
+    private static let ballTheme = ["⚽️", "🏀", "🏈", "⚾️", "🥎", "🎾", "🏉", "🥏", "🎱", "🪀"]
+    private static let heartTheme = ["🩷", "❤️", "🧡", "💚", "🩵", "💙", "🖤","❤️‍🔥", "💓", "💔"]
     private static let animalTheme = ["🐶", "🐱", "🐰", "🦊", "🐼", "🐸", "🙈", "🦁", "🦋", "🐝"]
     
     static func createMemoryGame() -> MemoryGame<String>{
@@ -33,6 +33,19 @@ class EmojiMemoryGame: ObservableObject{
     
     var cards: Array<MemoryGame<String>.Card>{
         return model.cards
+    }
+    
+    func chooseTheme(themeName theme:String){
+        switch theme{
+        case "heart":
+            model.chooseTheme(EmojiMemoryGame.heartTheme)
+        case "animal":
+            model.chooseTheme(EmojiMemoryGame.animalTheme)
+        case "ball":
+            model.chooseTheme(EmojiMemoryGame.ballTheme)
+        default:
+            print("do nothing")
+        }
     }
     
     
