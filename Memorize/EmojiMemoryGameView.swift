@@ -13,13 +13,13 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         VStack{
-            title
+            scoreBar
             ScrollView{
                 cards
-                    .animation(/*@START_MENU_TOKEN@*/.easeIn/*@END_MENU_TOKEN@*/, value: viewModel.cards)
+                    .animation(.easeInOut, value: viewModel.cards)
             }
-            themeButtonSection
         }
+        newGameBtn
         .padding(4)
     }
     
@@ -35,50 +35,36 @@ struct EmojiMemoryGameView: View {
                     .onTapGesture {
                         viewModel.choose(card)
                     }
-                    .disabled(card.isMatched)
             }
             .padding(4)
         }
-        .foregroundColor(.orange)
+        .foregroundColor(viewModel.getThemeColor())
     }
     
-    func themeChanger(theme: String, symbol:String, label:String) -> some View{
+    var newGameBtn : some View{
         VStack{
             Button(action: {
-                viewModel.chooseTheme(themeName: theme)
-            }, label: {
-                Image(systemName: symbol)
+                viewModel.restart()
+            },
+                   label: {
+                Image(systemName: "restart.circle.fill")
             })
-            Text(label).font(.callout)
+            Text("New Game").font(.callout)
         }.foregroundColor(.blue)
-        
+            .imageScale(.medium)
+            .font(.largeTitle)
     }
     
-    var animalThemeButton: some View{
-        themeChanger(theme: "animal", symbol: "pawprint.fill", label: "Animal")
-    }
-    
-    var heartThemeButton: some View{
-        themeChanger(theme: "heart", symbol: "heart.square.fill", label: "Heart")
-    }
-    
-    var ballThemeButton: some View{
-        themeChanger(theme: "ball", symbol: "soccerball.circle.fill", label: "Ball")
-    }
-    
-    var themeButtonSection: some View{
+    var scoreBar : some View{
         HStack{
+            Text(viewModel.getThemeName())
             Spacer()
-            animalThemeButton
-            Spacer()
-            heartThemeButton
-            Spacer()
-            ballThemeButton
-            Spacer()
-        }
-        .imageScale(/*@START_MENU_TOKEN@*/.medium/*@END_MENU_TOKEN@*/)
-        .font(.largeTitle)
+            Text(String(viewModel.getScore()))
+        }.font(.largeTitle)
+            .foregroundColor(.blue)
+            .padding(10)
     }
+    
     
 }
 
@@ -105,6 +91,7 @@ struct CardView: View {
         }
         .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
     }
+    
 }
 
 

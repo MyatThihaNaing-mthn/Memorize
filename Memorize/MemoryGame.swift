@@ -9,6 +9,9 @@ import Foundation
 
 struct MemoryGame<CardContent> where CardContent: Equatable{
     private(set) var cards:[Card]
+    private var point = 0
+    private var flipRecords = [Int]()
+    private var isAlreadySeen = false
     
     init(_ numberOfPairsOfCards: Int, cardContentFactory: (Int)->CardContent){
         cards = []
@@ -31,37 +34,40 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
     mutating func choose(_ card: Card){
         if let index = cards.firstIndex(where: {$0.id == card.id }){
             if !cards[index].isMatched && !cards[index].isFaceUp{
+                isAlreadySeen = flipRecords.contains(index)
+                if !isAlreadySeen{
+                    flipRecords.append(index)
+                }
                 if let potentialMatchIndex = indexOfOneAndOnlyFaceUpCard {
                     if cards[potentialMatchIndex].content == cards[index].content{
                         cards[index].isMatched = true
                         cards[potentialMatchIndex].isMatched = true
+                        point = point + 2
 
+                    }else{
+                        point = isAlreadySeen ? point-1 : point
                     }
                 }else{
                     indexOfOneAndOnlyFaceUpCard = index
+                    point = isAlreadySeen ? point-1 : point
                 }
                 cards[index].isFaceUp = true
             }
         }
+        print(point)
     }
+    
+
     
     
     mutating func shuffle(){
         cards.shuffle()
-        print(cards)
     }
     
-    
-    mutating func chooseTheme(_ newTheme:[CardContent]){
-        if newTheme.count >= cards.count/2{
-            for index in cards.indices{
-                cards[index].content = newTheme[index/2]
-                cards[index].isMatched = false
-                cards[index].isFaceUp = false
-            }
-            cards.shuffle()
-        }
+    func getScore() -> Int{
+        return point
     }
+    
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible{
         var debugDescription: String{
@@ -69,7 +75,7 @@ struct MemoryGame<CardContent> where CardContent: Equatable{
         }
         
         
-        var isFaceUp = true
+        var isFaceUp = false
         var isMatched = false
         var content: CardContent
         
